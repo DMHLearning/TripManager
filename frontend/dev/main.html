@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Agency Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        input, button {
+            margin: 10px 5px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #69a2e0;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #69a2e0;
+        }
+        .list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            background: white;
+            margin: 15px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 280px;
+        }
+        .card h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Tour Agency Dashboard</h1>
+
+    <!-- Section to Display and Add Clients -->
+    <section>
+        <h2>Clients</h2>
+        <form id="client-form">
+            <input type="text" id="client-name" placeholder="Name" required>
+            <input type="email" id="client-email" placeholder="Email" required>
+            <input type="text" id="client-phone" placeholder="Phone" required>
+            <button type="submit">Add Client</button>
+        </form>
+        <div id="client-list" class="list"></div>
+    </section>
+
+    <!-- Section to Display and Add Tours -->
+    <section>
+        <h2>Tours</h2>
+        <form id="tour-form">
+            <input type="text" id="tour-name" placeholder="Tour Name" required>
+            <input type="text" id="tour-description" placeholder="Description" required>
+            <input type="number" id="tour-price" placeholder="Price" required>
+            <input type="number" id="tour-duration" placeholder="Duration (days)" required>
+            <input type="number" id="tour-seats" placeholder="Seats" required>
+            <button type="submit">Add Tour</button>
+        </form>
+        <div id="tour-list" class="list"></div>
+    </section>
+
+    <!-- Section to Display and Add Bookings -->
+    <section>
+        <h2>Bookings</h2>
+        <form id="booking-form">
+            <input type="text" id="booking-client" placeholder="Client Email" required>
+            <input type="text" id="booking-tour" placeholder="Tour Name" required>
+            <input type="date" id="booking-date" required>
+            <input type="number" id="booking-seats" placeholder="Seats to Reserve" required>
+            <button type="submit">Add Booking</button>
+        </form>
+        <div id="booking-list" class="list"></div>
+    </section>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080';
+
+    // Fetch and display clients
+    function fetchClients() {
+        fetch(`${API_URL}/clients`)
+            .then(response => response.json())
+            .then(clients => {
+                const clientList = document.getElementById('client-list');
+                clientList.innerHTML = '';
+                clients.forEach(client => {
+                    clientList.innerHTML += `
+                            <div class="card">
+                                <h3>${client.name}</h3>
+                                <p>Email: ${client.email}</p>
+                                <p>Phone: ${client.phone}</p>
+                                <button onclick="removeClient('${client.email}')">Remove</button>
+                            </div>`;
+                });
+            });
+    }
+
+    // Fetch and display bookings
+    function fetchBookings() {
+        fetch(`${API_URL}/bookings`)
+            .then(response => response.json())
+            .then(bookings => {
+                const bookingList = document.getElementById('booking-list');
+                bookingList.innerHTML = '';
+                bookings.forEach(booking => {
+                    bookingList.innerHTML += `
+                            <div class="card">
+                                <h3>${booking.client.name}</h3>
+                                <p>Tour: ${booking.tour.name}</p>
+                                <p>Date: ${booking.bookingDate}</p>
+                                <p>Seats: ${booking.seatsReserved}</p>
+                                <button onclick="removeBooking(${booking.id})">Remove</button>
+                            </div>`;
+                });
+            });
+    }
+
+    // Add new client
+    document.getElementById('client-form').onsubmit = function(e) {
+        e.preventDefault();
+        const client = {
+            name: document.getElementById('client-name').value,
+            email: document.getElementById('client-email').value,
+            phone: document.getElementById('client-phone').value
+        };
+        fetch(`${API_URL}/clients`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(client)
+        }).then(() => fetchClients());
+    };
+
+    // Remove client
+    function removeClient(email) {
+        fetch(`${API_URL}/clients/${email}`, {
+            method: 'DELETE'
+        }).then(() => fetchClients());
+    }
+
+    // Add new tour
+    document.getElementById('tour-form').onsubmit = function(e) {
+        e.preventDefault();
+        const tour = {
+            name: document.getElementById('tour-name').value,
+            description: document.getElementById('tour-description').value,
+            price: parseFloat(document.getElementById('tour-price').value),
+            duration: parseInt(document.getElementById('tour-duration').value),
+            seats: parseInt(document.getElementById('tour-seats').value)
+        };
+        fetch(`${API_URL}/tours`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tour)
+        }).then(response => {
+            if (response.ok) {
+                fetchTours();
+                fetchBookings();
+            } else {
+                alert("Failed to add tour");
+            }
+        });
+    };
+
+    // Add new booking
+    document.getElementById('booking-form').onsubmit = function(e) {
+        e.preventDefault();
+        const booking = {
+            email: document.getElementById('booking-client').value,
+            tourName: document.getElementById('booking-tour').value,
+            bookingDate: document.getElementById('booking-date').value,
+            seatsReserved: parseInt(document.getElementById('booking-seats').value)
+        };
+        fetch(`${API_URL}/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(booking)
+        }).then(response => {
+            if (response.ok) {
+                fetchBookings();
+                fetchTours();
+            } else {
+                alert("Failed to add booking");
+            }
+        });
+    };
+
+    // Remove booking
+    function removeBooking(id) {
+        fetch(`${API_URL}/bookings/${id}`, {
+            method: 'DELETE'
+        }).then(() => fetchBookings());
+    }
+
+    // Fetch and display tours
+    function fetchTours() {
+        fetch(`${API_URL}/tours`)
+            .then(response => response.json())
+            .then(tours => {
+                const tourList = document.getElementById('tour-list');
+                tourList.innerHTML = '';
+                tours.forEach(tour => {
+                    tourList.innerHTML += `
+                    <div class="card">
+                        <h3>${tour.name}</h3>
+                        <p>${tour.description}</p>
+                        <p><strong>Price:</strong> $${tour.price}</p>
+                        <p><strong>Duration:</strong> ${tour.duration} days</p>
+                        <p><strong>Seats Available:</strong> ${tour.seats}</p>
+                        <button onclick="removeTour('${tour.name}')">Remove</button>
+                    </div>`;
+                });
+            });
+    }
+
+    // Remove tour
+    function removeTour(name) {
+        fetch(`${API_URL}/tours/${name}`, {
+            method: 'DELETE'
+        }).then(() => fetchTours());
+    }
+
+    // Initial data fetch
+    fetchClients();
+    fetchTours();
+    fetchBookings();
+
+</script>
+</body>
+</html>
