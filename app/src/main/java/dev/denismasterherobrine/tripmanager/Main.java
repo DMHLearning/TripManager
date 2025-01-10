@@ -28,13 +28,6 @@ public class Main {
 
         // Добавить клиента
         post("/clients", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             Client client = gson.fromJson(req.body(), Client.class);
             clientService.addClient(client.getName(), client.getEmail(), client.getPhone());
             res.status(201);
@@ -43,13 +36,6 @@ public class Main {
 
         // Получить всех клиентов
         get("/clients", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             List<Client> clients = clientService.getClients();
             res.type("application/json");
             return gson.toJson(clients);
@@ -57,13 +43,6 @@ public class Main {
 
         // Удалить клиента
         delete("/clients/:email", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             String email = req.params(":email");
             boolean removed = clientService.removeClient(email);
             res.status(removed ? 200 : 404);
@@ -72,12 +51,6 @@ public class Main {
 
         // Добавить бронирование
         post("/bookings", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
             BookingRequest request = gson.fromJson(req.body(), BookingRequest.class);
 
             Optional<Client> clientOpt = clientService.findClientByEmail(request.getEmail());
@@ -99,13 +72,6 @@ public class Main {
 
         // Получить все бронирования
         get("/bookings", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             List<Booking> bookings = bookingService.getBookings();
             res.type("application/json");
             return gson.toJson(bookings);
@@ -113,13 +79,6 @@ public class Main {
 
         // Отмена бронирования
         delete("/bookings", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             Booking booking = gson.fromJson(req.body(), Booking.class);
             boolean canceled = bookingService.cancelBooking(booking.getClient(), booking.getTour());
             res.status(canceled ? 200 : 404);
@@ -128,13 +87,6 @@ public class Main {
 
         // Добавить тур
         post("/tours", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             Tour tour = gson.fromJson(req.body(), Tour.class);
             tourService.addTour(tour.getName(), tour.getDescription(), tour.getPrice(), tour.getDuration(), tour.getSeats());
             res.status(201);
@@ -143,13 +95,6 @@ public class Main {
 
         // Получить все туры
         get("/tours", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             List<Tour> tours = tourService.getTours();
             res.type("application/json");
             return gson.toJson(tours);
@@ -157,13 +102,6 @@ public class Main {
 
         // Удалить тур
         delete("/tours/:name", (req, res) -> {
-            // Get request data
-            System.out.println(res.body());
-            if (req.body().isEmpty()) {
-                res.status(400);
-                return gson.toJson("Request body is empty! Is the frontend error not being catched?");
-            }
-
             String name = req.params(":name");
 
             List<Tour> tours = tourService.getTours();
