@@ -2,11 +2,13 @@ plugins {
     id("java")
 }
 
-group = "dev.denismasterherobrine.tripmanager"
-version = "1.0-SNAPSHOT"
+allprojects {
+    group = "dev.denismasterherobrine.tripmanager"
+    version = "1.1-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+    }
 }
 
 dependencies {

@@ -1,5 +1,9 @@
 package dev.denismasterherobrine.tripmanager.service;
 
+import dev.denismasterherobrine.tripmanager.booking.Booking;
+import dev.denismasterherobrine.tripmanager.booking.BookingService;
+import dev.denismasterherobrine.tripmanager.client.Client;
+import dev.denismasterherobrine.tripmanager.tour.Tour;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
